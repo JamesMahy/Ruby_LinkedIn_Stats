@@ -1,0 +1,15 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    json (2.1.0)
+    mini_magick (4.9.2)
+
+PLATFORMS
+  x64-mingw32
+
+DEPENDENCIES
+  json
+  mini_magick
+
+BUNDLED WITH
+   1.16.6
