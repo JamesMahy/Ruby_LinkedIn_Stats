@@ -3,11 +3,11 @@ require 'json'
 require 'open-uri'
 require 'fileutils'
 require 'sqlite3'
-
 require_relative  'mini_magick.rb'
 require_relative  'person.rb'
 
 $database = SQLite3::Database.new 'data/db.db'
+$database.results_as_hash = true
 
 def process_json_file
   file = File.read('data/data.json')

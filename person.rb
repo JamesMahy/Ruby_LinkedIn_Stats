@@ -2,23 +2,25 @@
 class Person
   attr_reader :name, :occupation, :public_identifier, :image_root, :image, :greyscale_image
 
-  def initialize(name:, occupation:, public_identifier:, image_root:, image:)
+  def initialize(name:, occupation:, public_identifier:, image_root:, image:, greyscale:false, download_the_image: true, save:true)
     @name = name
     @occupation = occupation
     @public_identifier = public_identifier
     @image_root = image_root
     @image = image
-    @greyscale_image = false
+    @greyscale_image = greyscale
 
-    download_image
-    image_path = "#{Dir.pwd}/#{get_local_image_path(true)}"
+    if download_the_image
+      download_image
+      image_path = "#{Dir.pwd}/#{get_local_image_path(true)}"
 
-    unless image_path.nil? || @image.nil?
-      i = MiniMagick::Image.open(image_path)
-      @greyscale_image = i.greyscale?
+      unless image_path.nil? || @image.nil?
+        i = MiniMagick::Image.open(image_path)
+        @greyscale_image = i.greyscale?
+      end
     end
 
-    Person.save(self)
+    Person.save(self) unless !save
   end
 
   def image_uri
@@ -64,9 +66,26 @@ class Person
   def self.get_by_public_identifier(public_identifier)
     $database.execute( 'select * from people WHERE id = ?',
                        [public_identifier]) do |row|
-      return row
+      return Person.convert_db_row_to_person(row)
     end
     nil
+  end
+
+  def self.all
+    people = []
+    $database.execute('select * from people') do |row|
+      person = Person.convert_db_row_to_person(row)
+      people.push(person)
+    end
+
+    people
+  end
+
+  def self.convert_db_row_to_person(row)
+    Person.new(name: row['name'], occupation: row['occupation'],
+               public_identifier: row['id'], image_root: '', image: '',
+               greyscale: (row['greyscale'].to_i ? true : false),
+               download_the_image: false, save: false)
   end
 
   def self.process_json(person)
@@ -83,11 +102,9 @@ class Person
         image = person['picture']['artifacts'][0]['fileIdentifyingUrlPathSegment']
       end
 
-      Person.new( name: person_name,
-                  occupation: occupation,
-                  public_identifier: public_identifier,
-                  image_root: image_root,
-                  image: image)
+      Person.new(name: person_name, occupation: occupation,
+                 public_identifier: public_identifier,
+                 image_root: image_root, image: image)
     end
   end
 end
