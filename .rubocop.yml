@@ -3,3 +3,6 @@ Metrics/MethodLength:
 
 Metrics/AbcSize:
   Enabled: false
+
+GlobalVars:
+  AllowedVariables: $database

@@ -2,6 +2,9 @@ require 'mini_magick'
 require 'json'
 require 'open-uri'
 require 'fileutils'
+require 'sqlite3'
+
+$database = SQLite3::Database.new 'data/db.db'
 
 module MiniMagick
   # Extends the image class to include the greyscale? method
@@ -21,7 +24,7 @@ end
 
 # Person class
 class Person
-  attr_reader :name, :occupation, :public_identifier, :image_root, :image
+  attr_reader :name, :occupation, :public_identifier, :image_root, :image, :greyscale_image
 
   def initialize(name:, occupation:, public_identifier:, image_root:, image:)
     @name = name
@@ -29,8 +32,17 @@ class Person
     @public_identifier = public_identifier
     @image_root = image_root
     @image = image
+    @greyscale_image = false
 
     download_image
+    image_path = "#{Dir.pwd}/#{get_local_image_path(true)}"
+
+    unless image_path.nil? || @image.nil?
+      i = MiniMagick::Image.open(image_path)
+      @greyscale_image = i.greyscale?
+    end
+
+    Person.save(self)
   end
 
   def image_uri
@@ -38,12 +50,12 @@ class Person
   end
 
   def get_local_image_path(exists)
-    path = "#{Dir.pwd}/data/images/#{@public_identifier}.jpg"
-    !exists || File.file?(path) ? path : nil
+    path = "data/images/#{@public_identifier}.jpg"
+    !exists || File.file?("#{Dir.pwd}/#{path}") ? path : nil
   end
 
   def download_image
-    future_file = get_local_image_path(false)
+    future_file = "#{Dir.pwd}/#{get_local_image_path(false)}"
     if @image_root && @image
       begin
         unless File.file?(future_file)
@@ -57,6 +69,28 @@ class Person
     else
       FileUtils.cp('wizard_color.jpg', future_file)
     end
+  end
+
+  def self.save(person)
+    existing = Person.get_by_public_identifier(person.public_identifier)
+    unless existing # rubocop:disable Style/GuardClause
+      $database.execute('INSERT INTO people (id, name, occupation, image, greyscale) VALUES (?, ?, ?, ?, ?)',
+                        [
+                          person.public_identifier,
+                          person.name,
+                          person.occupation,
+                          person.get_local_image_path(true),
+                          person.greyscale_image ? 1 : 0
+                      ])
+    end
+  end
+
+  def self.get_by_public_identifier(public_identifier)
+    $database.execute( 'select * from people WHERE id = ?',
+                       [public_identifier]) do |row|
+      return row
+    end
+    nil
   end
 end
 
@@ -79,14 +113,6 @@ def process_person(person)
                         public_identifier: public_identifier,
                         image_root: image_root,
                         image: image)
-
-    image_path = person.get_local_image_path(true)
-
-    unless image_path.nil? || image.nil?
-      image = MiniMagick::Image.open(image_path)
-      puts "#{person.occupation} - #{image.greyscale?}"
-    end
-
     person
 
   end
@@ -104,4 +130,4 @@ def process_json_file
   arr.each { |data_set| data_set ? process_data_set(data_set) : nil }
 end
 
-process_json_file
+#process_json_file()
