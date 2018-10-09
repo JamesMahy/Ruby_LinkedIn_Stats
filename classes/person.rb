@@ -63,7 +63,7 @@ class Person
                           person.greyscale_image ? 1 : 0
                         ])
       rescue StandardError
-        puts "Something went wrong with #{person.public_identifier}"
+        puts "Something went wrong with saving #{person.public_identifier}"
       end
     end
   end

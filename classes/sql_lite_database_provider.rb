@@ -1,3 +1,5 @@
+require 'sqlite3'
+
 class SQLLiteDatabaseProvider < AbstractSQLDatabaseProvider
   attr_accessor :database
 

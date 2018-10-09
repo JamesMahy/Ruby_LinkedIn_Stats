@@ -2,15 +2,14 @@ require 'mini_magick'
 require 'json'
 require 'open-uri'
 require 'fileutils'
-require 'sqlite3'
 
 require_relative 'classes/interface.rb'
 require_relative 'classes/abstract_sql_database_provider.rb'
-require_relative 'classes/sql_lite_database_provider.rb'
+require_relative 'classes/mysql_database_provider.rb'
 require_relative 'classes/mini_magick.rb'
 require_relative 'classes/person.rb'
 
-$database = SQLLiteDatabaseProvider.new
+$database = MYSQLDatabaseProvider.new
 $database.connect
 
 def process_json_file
@@ -25,4 +24,5 @@ def process_json_file
   end
 end
 
-#process_json_file()
+#p Person.all
+process_json_file()
