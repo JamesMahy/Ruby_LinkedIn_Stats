@@ -3,8 +3,8 @@ class Person
   attr_reader :name, :occupation, :public_identifier, :image_root, :image, :greyscale_image
 
   def initialize(name:, occupation:, public_identifier:, image_root:, image:, greyscale:false, download_the_image: true, save:true)
-    @name = name
-    @occupation = occupation
+    @name = name.gsub(/[^A-Z0-9_\- ]+/i, '')
+    @occupation = occupation.gsub(/[^A-Z0-9_\- ]+/i, '')
     @public_identifier = public_identifier
     @image_root = image_root
     @image = image
@@ -52,14 +52,19 @@ class Person
   def self.save(person)
     existing = Person.get_by_public_identifier(person.public_identifier)
     unless existing # rubocop:disable Style/GuardClause
-      $database.query('INSERT INTO people (id, name, occupation, image, greyscale) VALUES (?, ?, ?, ?, ?)',
-                      [
-                        person.public_identifier,
-                        person.name,
-                        person.occupation,
-                        person.get_local_image_path(true),
-                        person.greyscale_image ? 1 : 0
-                      ])
+      begin
+        $database.query('INSERT INTO people (id, name, occupation, image, greyscale)
+                         VALUES (?, ?, ?, ?, ?)',
+                        [
+                          person.public_identifier,
+                          person.name,
+                          person.occupation,
+                          person.get_local_image_path(true),
+                          person.greyscale_image ? 1 : 0
+                        ])
+      rescue StandardError
+        puts "Something went wrong with #{person.public_identifier}"
+      end
     end
   end
 
