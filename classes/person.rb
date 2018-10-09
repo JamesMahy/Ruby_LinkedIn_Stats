@@ -52,19 +52,19 @@ class Person
   def self.save(person)
     existing = Person.get_by_public_identifier(person.public_identifier)
     unless existing # rubocop:disable Style/GuardClause
-      $database.execute('INSERT INTO people (id, name, occupation, image, greyscale) VALUES (?, ?, ?, ?, ?)',
-                        [
-                          person.public_identifier,
-                          person.name,
-                          person.occupation,
-                          person.get_local_image_path(true),
-                          person.greyscale_image ? 1 : 0
-                        ])
+      $database.query('INSERT INTO people (id, name, occupation, image, greyscale) VALUES (?, ?, ?, ?, ?)',
+                      [
+                        person.public_identifier,
+                        person.name,
+                        person.occupation,
+                        person.get_local_image_path(true),
+                        person.greyscale_image ? 1 : 0
+                      ])
     end
   end
 
   def self.get_by_public_identifier(public_identifier)
-    $database.execute( 'select * from people WHERE id = ?',
+    $database.query( 'select * from people WHERE id = ?',
                        [public_identifier]) do |row|
       return Person.convert_db_row_to_person(row)
     end
@@ -73,7 +73,7 @@ class Person
 
   def self.all
     people = []
-    $database.execute('select * from people') do |row|
+    $database.query('select * from people') do |row|
       person = Person.convert_db_row_to_person(row)
       people.push(person)
     end

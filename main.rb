@@ -3,11 +3,15 @@ require 'json'
 require 'open-uri'
 require 'fileutils'
 require 'sqlite3'
-require_relative  'mini_magick.rb'
-require_relative  'person.rb'
 
-$database = SQLite3::Database.new 'data/db.db'
-$database.results_as_hash = true
+require_relative 'classes/interface.rb'
+require_relative 'classes/abstract_sql_database_provider.rb'
+require_relative 'classes/sql_lite_database_provider.rb'
+require_relative 'classes/mini_magick.rb'
+require_relative 'classes/person.rb'
+
+$database = SQLLiteDatabaseProvider.new
+$database.connect
 
 def process_json_file
   file = File.read('data/data.json')
