@@ -70,7 +70,7 @@ class Person
 
   def self.get_by_public_identifier(public_identifier)
     $database.query( 'select * from people WHERE id = ?',
-                       [public_identifier]) do |row|
+                     [public_identifier]) do |row|
       return Person.convert_db_row_to_person(row)
     end
     nil
@@ -82,7 +82,6 @@ class Person
       person = Person.convert_db_row_to_person(row)
       people.push(person)
     end
-
     people
   end
 
