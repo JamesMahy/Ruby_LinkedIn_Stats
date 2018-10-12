@@ -3,8 +3,11 @@ require 'json'
 require 'open-uri'
 require 'fileutils'
 
+
 require_relative 'classes/interface.rb'
 require_relative 'classes/abstract_sql_database_provider.rb'
+require_relative 'classes/color.rb'
+require_relative 'classes/color_map.rb'
 require_relative 'classes/mysql_database_provider.rb'
 require_relative 'classes/mini_magick.rb'
 require_relative 'classes/person.rb'
@@ -25,4 +28,25 @@ def process_json_file
 end
 
 #p Person.all
-process_json_file()
+#process_json_file()
+
+i = MiniMagick::Image.open("data/images/usmanyaqub.jpg")
+map = Color_Map.new(i)
+
+puts map.dominant_color
+
+=begin
+data/images/charlenechami.jpg
+Dir.glob('data/images/*.jpg').each do |file|
+
+  next unless !file.equal?('..') && !file.equal?('.')
+
+  i = MiniMagick::Image.open("#{file}")
+  map = Color_Map.new(i)
+
+  puts file
+  puts map.dominant_color
+
+end
+=end
+
