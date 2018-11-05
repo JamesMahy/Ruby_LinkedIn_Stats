@@ -14,7 +14,7 @@ module MiniMagick
 
     def color_profile
       result = run_command('convert', path, '-format', '"%c"', 'histogram:info:')
-      puts result
+      #puts result
 
       m = result.scan /([0-9]+): \(([0-9 ]+),([0-9 ]+),([ 0-9]+)\)/ism
       ret = []

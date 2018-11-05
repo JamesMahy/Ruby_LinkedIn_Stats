@@ -27,6 +27,17 @@ def process_json_file
   end
 end
 
+
+
+exit
+
+
+i = MiniMagick::Image.open("data/images/richdibbins.jpg")
+map = Color_Map.new(i)
+
+puts map.dominant_colorss
+exit
+
 Dir.glob('data/images/*.jpg').each do |file|
 
   next unless !file.equal?('..') && !file.equal?('.')
@@ -38,5 +49,4 @@ Dir.glob('data/images/*.jpg').each do |file|
   puts map.dominant_color
 
 end
-
 

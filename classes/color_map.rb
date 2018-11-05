@@ -18,7 +18,7 @@ class Color_Map
 
     colors = image.color_profile
     colors.each do |color|
-      puts "#{color.count} #{color.red}, #{color.green}, #{color.blue} - #{color.name}"
+      #puts "#{color.count} #{color.red}, #{color.green}, #{color.blue} - #{color.name}"
       begin
         @map[color.name] += color.count
       rescue StandardError
@@ -27,15 +27,9 @@ class Color_Map
     end
   end
 
-  def dominant_color
+  def dominant_colors
     sorted = @map.sort_by{ |key, value| value }
-    last = sorted.last
-    if sorted[sorted.count - 2][1] >= (last[1] - 10) &&
-       sorted[sorted.count - 2][1] <= (last[1] + 10) &&
-       (last.equal?('white') || last.equal?('black'))
-      sorted[sorted.count - 2][0]
-    end
-    sorted.last[0]
+    [sorted[10][0], sorted[9][0], sorted[8][0]]
   end
 
 end
