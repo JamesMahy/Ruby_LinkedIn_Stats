@@ -27,16 +27,6 @@ def process_json_file
   end
 end
 
-#p Person.all
-#process_json_file()
-
-i = MiniMagick::Image.open("data/images/usmanyaqub.jpg")
-map = Color_Map.new(i)
-
-puts map.dominant_color
-
-=begin
-data/images/charlenechami.jpg
 Dir.glob('data/images/*.jpg').each do |file|
 
   next unless !file.equal?('..') && !file.equal?('.')
@@ -48,5 +38,5 @@ Dir.glob('data/images/*.jpg').each do |file|
   puts map.dominant_color
 
 end
-=end
+
 
